@@ -1,0 +1,7 @@
+---
+# Playbook for installing Cosmos Node
+
+- hosts: all
+  remote_user: root
+  roles:
+    - role: cosmos

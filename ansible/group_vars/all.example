@@ -1,0 +1,3 @@
+---
+gaiad_node_endpoint: "http://127.0.0.1:26657"
+sshd_user: "example"

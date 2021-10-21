@@ -1,0 +1,50 @@
+---
+- name: "Cosmos node group"
+  group:
+    name: telemetry
+    state: present
+
+- name: "Cosmos node user"
+  user:
+    name: telemetry
+    group: telemetry
+    state: present
+
+- name: "Environment directory"
+  file:
+    path: /etc/sysconfig
+    state: directory
+    owner: root
+    group: root
+
+- name: "Copy telemetry service environment file"
+  template:
+    src: "{{ playbook_dir }}/roles/cosmos/templates/gaiad_telemetry.j2"
+    dest: /etc/sysconfig/gaiad_telemetry
+    owner: root
+    group: root
+    mode: 600
+
+- name: "Copy telemetry service"
+  template:
+    src: "{{ playbook_dir }}/roles/cosmos/templates/gaiad_telemetry.service.j2"
+    dest: /etc/systemd/system/gaiad_telemetry.service
+    owner: root
+    group: root
+    mode: 644
+  notify:
+    - reload systemctl
+
+- name: "Copy telemetry binary"
+  copy:
+    src: "{{ playbook_dir }}/../telemetry/content/gaiad_telemetry"
+    dest: /opt/cosmos/gaiad_telemetry
+    owner: telemetry
+    group: telemetry
+    mode: 770
+
+- name: "Start telemetry service"
+  service:
+    name: gaiad_telemetry.service
+    state: restarted
+    enabled: yes

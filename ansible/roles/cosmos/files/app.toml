@@ -1,0 +1,81 @@
+###############################################################################
+###                         Telemetry Configuration                         ###
+###############################################################################
+
+[telemetry]
+
+# Prefixed with keys to separate services.
+service-name = ""
+
+# Enabled enables the application telemetry functionality. When enabled,
+# an in-memory sink is also enabled by default. Operators may also enabled
+# other sinks such as Prometheus.
+enabled = true
+
+# Enable prefixing gauge values with hostname.
+enable-hostname = false
+
+# Enable adding hostname to labels.
+enable-hostname-label = false
+
+# Enable adding service to labels.
+enable-service-label = false
+
+# PrometheusRetentionTime, when positive, enables a Prometheus metrics sink.
+prometheus-retention-time = 0
+
+# GlobalLabels defines a global set of name/value label tuples applied to all
+# metrics emitted using the wrapper functions defined in telemetry package.
+#
+# Example:
+# [["chain_id", "cosmoshub-1"]]
+global-labels = [
+]
+
+###############################################################################
+###                           API Configuration                             ###
+###############################################################################
+[api]
+# Enable defines if the API server should be enabled.
+enable = false
+# Swagger defines if swagger documentation should automatically be registered.
+swagger = false
+# Address defines the API server to listen on.
+address = "tcp://0.0.0.0:1317"
+
+##### main base config options #####
+
+# The minimum gas prices a validator is willing to accept for processing a
+# transaction. A transaction's fees must meet the minimum of any denomination
+# specified in this config (for example, 10uatom).
+
+# minimum-gas-prices = "0.0025uatom"
+
+minimum-gas-prices = ""
+
+###############################################################################
+###                           gRPC Configuration                            ###
+###############################################################################
+
+[grpc]
+
+# Enable defines if the gRPC server should be enabled.
+enable = false
+
+# Address defines the gRPC server address to bind to.
+address = "0.0.0.0:9090"
+
+###############################################################################
+###                        State Sync Configuration                         ###
+###############################################################################
+
+# State sync snapshots allow other nodes to rapidly join the network without replaying historical
+# blocks, instead downloading and applying a snapshot of the application state at a given height.
+[state-sync]
+
+# snapshot-interval specifies the block interval at which local state sync snapshots are
+# taken (0 to disable). Must be a multiple of pruning-keep-every.
+snapshot-interval = 0
+
+# snapshot-keep-recent specifies the number of recent snapshots to keep and serve (0 to keep all).
+snapshot-keep-recent = 2

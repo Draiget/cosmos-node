@@ -1,0 +1,2 @@
+[nodes]
+172.0.0.1 node_name="p2p-test" ansible_ssh_private_key_file=~/.ssh/node-key

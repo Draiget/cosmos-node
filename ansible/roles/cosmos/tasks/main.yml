@@ -1,0 +1,9 @@
+---
+- name: "Install Cosmos Node (Hub)"
+  include_tasks: "cosmos_full.yml"
+  register: cosmos_node
+
+- name: "Install Cosmos Telemetry"
+  include_tasks: "gaiad_telemetry.yml"
+  register: gaiad_telemetry
+

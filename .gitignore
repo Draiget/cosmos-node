@@ -1,0 +1,6 @@
+.idea/
+content/
+
+hosts
+
+ansible/group_vars/all

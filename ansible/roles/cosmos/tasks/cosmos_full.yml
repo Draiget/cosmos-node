@@ -1,0 +1,107 @@
+---
+- name: "Cosmos node group"
+  group:
+    name: cosmos
+    state: present
+
+- name: "Cosmos node user"
+  user:
+    name: cosmos
+    group: cosmos
+    state: present
+
+- name: "Working directory"
+  file:
+    path: /opt/cosmos
+    state: directory
+    owner: cosmos
+    group: cosmos
+
+- name: "Home node config directory"
+  file:
+    path: /home/cosmos/.gaia/config
+    state: directory
+    owner: cosmos
+    group: cosmos
+
+- name: "Gaiad node installation check"
+  stat:
+    path: /opt/cosmos/gaiad4
+  register: gaiad4_exists
+
+- name: "Copy gaiad4"
+  copy:
+    src: "{{ playbook_dir }}/../node/content/gaiad4"
+    dest: /opt/cosmos/gaiad4
+    owner: cosmos
+    group: cosmos
+    mode: u=rx,g=rx
+  when: not gaiad4_exists.stat.exists
+  register: gaiad4_copied
+
+- name: "Copy gaiad5"
+  copy:
+    src: "{{ playbook_dir }}/../node/content/gaiad5"
+    dest: /opt/cosmos/gaiad5
+    owner: cosmos
+    group: cosmos
+    mode: u=rx,g=rx
+  when: gaiad4_copied is not skipped
+
+- name: "Copy app.toml config file"
+  copy:
+    src: "{{ playbook_dir }}/roles/cosmos/files/app.toml"
+    dest: /home/cosmos/.gaia/config
+    owner: cosmos
+    group: cosmos
+    mode: u=rwx,g=rwx
+  when: gaiad4_copied is not skipped
+
+- name: "Copy config.toml.j2 config file"
+  template:
+    src: "{{ playbook_dir }}/roles/cosmos/templates/config.toml.j2"
+    dest: /home/cosmos/.gaia/config/config.toml
+    owner: cosmos
+    group: cosmos
+    mode: u=rwx,g=rwx
+  when: gaiad4_copied is not skipped
+
+- name: "Download genesis json"
+  get_url:
+    url: https://github.com/cosmos/mainnet/raw/master/genesis.cosmoshub-4.json.gz
+    dest: /home/cosmos/.gaia/config/genesis.cosmoshub-4.json.gz
+  become: true
+  become_user: cosmos
+  when: gaiad4_copied is not skipped
+
+- name: "Init node"
+  shell:
+    cmd: ./gaiad4 init chooseanicehandle
+    chdir: /opt/cosmos
+  become: true
+  become_user: cosmos
+  when: gaiad4_copied is not skipped
+
+- name: "Extract genesis json"
+  shell: (rm -f genesis.cosmoshub-4.json || true) && gzip -d genesis.cosmoshub-4.json.gz && mv genesis.cosmoshub-4.json genesis.json
+  args:
+    chdir: /home/cosmos/.gaia/config/
+  become: true
+  become_user: cosmos
+  when: gaiad4_copied is not skipped
+
+- name: "Copy telemetry service"
+  template:
+    src: "{{ playbook_dir }}/roles/cosmos/templates/cosmos_node.service.j2"
+    dest: /etc/systemd/system/cosmos_node.service
+    owner: root
+    group: root
+    mode: 644
+  notify:
+    - reload systemctl
+
+- name: "Start cosmos node service"
+  service:
+    name: cosmos_node.service
+    state: restarted
+    enabled: yes
