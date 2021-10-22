@@ -10,6 +10,14 @@
     group: telemetry
     state: present
 
+- name: "Homedir permissions"
+  file:
+    dest: /home/telemetry
+    owner: telemetry
+    group: telemetry
+    mode: 0750
+    recurse: yes
+
 - name: "Environment directory"
   file:
     path: /etc/sysconfig
@@ -17,13 +25,21 @@
     owner: root
     group: root
 
+- name: "Working directory"
+  file:
+    path: /opt/telemetry
+    state: directory
+    owner: telemetry
+    group: telemetry
+    mode: 0750
+
 - name: "Copy telemetry service environment file"
   template:
     src: "{{ playbook_dir }}/roles/cosmos/templates/gaiad_telemetry.j2"
     dest: /etc/sysconfig/gaiad_telemetry
     owner: root
     group: root
-    mode: 600
+    mode: 0600
 
 - name: "Copy telemetry service"
   template:
@@ -31,17 +47,17 @@
     dest: /etc/systemd/system/gaiad_telemetry.service
     owner: root
     group: root
-    mode: 644
+    mode: 0644
   notify:
     - reload systemctl
 
 - name: "Copy telemetry binary"
   copy:
     src: "{{ playbook_dir }}/../telemetry/content/gaiad_telemetry"
-    dest: /opt/cosmos/gaiad_telemetry
+    dest: /opt/telemetry/gaiad_telemetry
     owner: telemetry
     group: telemetry
-    mode: 770
+    mode: 0750
 
 - name: "Start telemetry service"
   service:

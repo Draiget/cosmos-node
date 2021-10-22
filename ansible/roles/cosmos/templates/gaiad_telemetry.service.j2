@@ -9,9 +9,9 @@ Group=telemetry
 Type=simple
 Restart=always
 RestartSec=1
-WorkingDirectory=/opt/cosmos/
+WorkingDirectory=/opt/telemetry
 EnvironmentFile=/etc/sysconfig/gaiad_telemetry
-ExecStart=/opt/cosmos/gaiad_telemetry
+ExecStart=/opt/telemetry/gaiad_telemetry
 
 CapabilityBoundingSet=
 LockPersonality=true

@@ -10,6 +10,22 @@
     group: cosmos
     state: present
 
+- name: "Homedir permissions"
+  file:
+    dest: /home/cosmos
+    owner: cosmos
+    group: cosmos
+    mode: 0750
+    recurse: yes
+
+- name: "Gaiga directory permissions"
+  file:
+    dest: /home/cosmos/.gaia
+    owner: cosmos
+    group: cosmos
+    mode: 0760
+    recurse: yes
+
 - name: "Working directory"
   file:
     path: /opt/cosmos
@@ -35,7 +51,7 @@
     dest: /opt/cosmos/gaiad4
     owner: cosmos
     group: cosmos
-    mode: u=rx,g=rx
+    mode: 0760
   when: not gaiad4_exists.stat.exists
   register: gaiad4_copied
 
@@ -45,25 +61,25 @@
     dest: /opt/cosmos/gaiad5
     owner: cosmos
     group: cosmos
-    mode: u=rx,g=rx
+    mode: 0760
   when: gaiad4_copied is not skipped
 
 - name: "Copy app.toml config file"
   copy:
     src: "{{ playbook_dir }}/roles/cosmos/files/app.toml"
-    dest: /home/cosmos/.gaia/config
+    dest: /home/cosmos/.gaia/config/app.toml
+    mode: 0760
     owner: cosmos
     group: cosmos
-    mode: u=rwx,g=rwx
   when: gaiad4_copied is not skipped
 
 - name: "Copy config.toml.j2 config file"
   template:
     src: "{{ playbook_dir }}/roles/cosmos/templates/config.toml.j2"
     dest: /home/cosmos/.gaia/config/config.toml
+    mode: 0760
     owner: cosmos
     group: cosmos
-    mode: u=rwx,g=rwx
   when: gaiad4_copied is not skipped
 
 - name: "Download genesis json"

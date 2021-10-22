@@ -4,3 +4,5 @@ content/
 hosts
 
 ansible/group_vars/all
+lynis.log
+lynis-report.dat
